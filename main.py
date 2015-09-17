@@ -24,6 +24,7 @@ while True:
     print Px
     print estimator.state, "\n"
     estimator.predict(dt)
-    estimator.update([Px, Pz, atan2(Tx-Px,-Pz-(-Tz))])
+    estimator.set_params([Px,Pz])
+    estimator.update([atan2(Tx-Px,-Pz-(-Tz))])
 
     t += dt

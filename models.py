@@ -34,7 +34,7 @@ class Copter:
         self.roll_ang_acc_lim = 2.0
         self.drag_coeff = 9.81/18
         self.wind = 5
-        self.fov = radians(26)
+        self.fov = radians(16)
         self.last_roll_ang_vel_err = 0
 
         self.vel_target = Vector3(0,0,0)
@@ -45,7 +45,7 @@ class Copter:
 
         cone_axis = -Vector3(0,-sin(self.roll_ang),cos(self.roll_ang))*30
 
-        self.copter_vis = cone(pos=(self.pos-cone_axis).get_vpy_vec(), axis=cone_axis.get_vpy_vec(), opacity=.1, radius=cone_axis.length()*sin(self.fov/2))
+        self.copter_vis = cone(pos=(self.pos-cone_axis).get_vpy_vec(), axis=cone_axis.get_vpy_vec(), opacity=.1, radius=cone_axis.length()*tan(self.fov/2))
         self.target_vis = sphere(pos=self.tar_pos.get_vpy_vec(),radius=0.5)
 
     def get_dir_to_target(self):

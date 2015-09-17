@@ -56,30 +56,22 @@ class TargetEstimator(ExtendedKalmanFilter):
         # x hat on wikipedia
         self.state = np.matrix([
             [ 0. ], # Tx
-            [ 0. ], # Tz
-            [ 0. ], # Px
-            [ -10. ]  # Pz
+            [ 0. ]  # Tz
             ])
 
         # P on wikipedia
         self.covariance = np.matrix([
-            [ 16.**2 ,   0   ,   0   ,   0   ],
-            [   0   , 4.**2 ,   0   ,   0   ],
-            [   0   ,   0   , 0.**2 ,   0   ],
-            [   0   ,   0   ,   0   , 0.**2 ]
+            [ 16.**2 ,   0   ],
+            [    0   , 4.**2 ]
             ])
 
     def f(self, dt, u):
         Tx = self.state.item(0)
         Tz = self.state.item(1)
-        Px = self.state.item(2)
-        Pz = self.state.item(3)
 
         return np.matrix([
             [ Tx ],
-            [ Tz ],
-            [ Px ],
-            [ Pz ]
+            [ Tz ]
             ])
 
 
@@ -88,44 +80,34 @@ class TargetEstimator(ExtendedKalmanFilter):
 
     def R(self):
         return np.matrix([
-            [ .05**2 ,    0   ,       0       ],
-            [   0    , .05**2 ,       0       ],
-            [   0    ,    0   , radians(0.0001)**2 ]
+            [ radians(1)**2 ]
             ])
 
     def Q(self,dt):
         Tx_PNOISE = 0.1
         Tz_PNOISE = 0.1
-        Px_PNOISE = 0.2
-        Pz_PNOISE = 0.2
         return np.matrix([
-            [ (Tx_PNOISE*dt)**2 ,         0         ,         0         ,         0         ],
-            [         0         , (Tz_PNOISE*dt)**2 ,         0         ,         0         ],
-            [         0         ,         0         , (Px_PNOISE*dt)**2 ,         0         ],
-            [         0         ,         0         ,         0         , (Pz_PNOISE*dt)**2 ]
+            [ (Tx_PNOISE*dt)**2 ,         0        ],
+            [         0         , (Tz_PNOISE*dt)**2]
             ])
 
     def h(self):
         Tx = self.state.item(0)
         Tz = self.state.item(1)
-        Px = self.state.item(2)
-        Pz = self.state.item(3)
+        Px = self.params[0]
+        Pz = self.params[1]
         return np.matrix([
-            [ Px ],
-            [ Pz ],
             [ atan2(Tx-Px,-Pz-(-Tz)) ]
             ])
 
     def H(self):
         Tx = self.state.item(0)
         Tz = self.state.item(1)
-        Px = self.state.item(2)
-        Pz = self.state.item(3)
+        Px = self.params[0]
+        Pz = self.params[1]
 
         return np.matrix([
-            [ 0 , 0 , 1 , 0 ],
-            [ 0 , 0 , 0 , 1 ],
-            [ (Tz-Pz)/((Tx-Px)**2+(Tz-Pz)**2) , (Px-Tx)/((Tx-Px)**2+(Tz-Pz)**2) , -(Tz-Pz)/((Tx-Px)**2+(Tz-Pz)**2) , -(Px-Tx)/((Tx-Px)**2+(Tz-Pz)**2) ]
+            [ (Tz-Pz)/((Tx-Px)**2+(Tz-Pz)**2) , (Px-Tx)/((Tx-Px)**2+(Tz-Pz)**2) ]
             ])
 
     def __str__(self):
